@@ -140,9 +140,34 @@ function initializeWidgetServer () {
             });
     }
 }
+
+function startServiceWidgets() {
+  var widgetLibrary;
+  var webinosPath = PzpSession.getWebinosPath ();
+
+  try {
+    var child = require('child_process');
+    widgetLibrary = require("webinos-widget");
+
+    var idList = widgetLibrary.widgetmanager.getInstalledWidgets();
+    for (var installId in idList) {
+      var cfg = widgetLibrary.widgetmanager.getWidgetConfig(idList[installId]);
+      if (cfg.startFile.contentType === "text/javascript") {
+        var widgetDir = widgetLibrary.widgetmanager.getWidgetDir(cfg.installId);
+        var widgetPath = path.join(widgetDir,cfg.startFile.path);
+        child.fork(widgetPath);
+      }
+    }
+
+  } catch(e) {
+    console.log("********** unable to load service widgets - failed to load widget manager: " + e.message);
+  }
+}
+
 function startPzp() {
     var pzpInstance = PzpSession.getInstance();
     pzpInstance.on("PZP_STARTED", function(){
+        startServiceWidgets();
         testStart(true);
         if (argv.widgetServer) initializeWidgetServer ();
     });
