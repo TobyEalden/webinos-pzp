@@ -153,8 +153,10 @@ function startServiceWidgets() {
     for (var installId in idList) {
       var cfg = widgetLibrary.widgetmanager.getWidgetConfig(idList[installId]);
       if (cfg.startFile.contentType === "text/javascript") {
+        console.log("starting service widget " + cfg.installId);
         var widgetDir = widgetLibrary.widgetmanager.getWidgetDir(cfg.installId);
         var widgetPath = path.join(widgetDir,cfg.startFile.path);
+        console.log("*** " + widgetPath);
         child.fork(widgetPath);
       }
     }
