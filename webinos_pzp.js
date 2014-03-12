@@ -157,7 +157,10 @@ function startServiceWidgets() {
         var widgetDir = widgetLibrary.widgetmanager.getWidgetDir(cfg.installId);
         var widgetPath = path.join(widgetDir,cfg.startFile.path);
         console.log("*** " + widgetPath);
-        child.fork(widgetPath);
+        var childProc = child.fork(widgetPath);
+        console.log("*** forked: " + childProc.pid);
+        childProc.on("close", function(code,signal) { console.log("service widget closed with code: " + code + " and signal " + signal); });
+        childProc.on("exit", function(code,signal) { console.log("service widget ended with code: " + code + " and signal " + signal); });
       }
     }
 
