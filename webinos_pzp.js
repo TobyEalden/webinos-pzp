@@ -140,9 +140,39 @@ function initializeWidgetServer () {
             });
     }
 }
+
+function startServiceWidgets() {
+  var widgetLibrary;
+  var webinosPath = PzpSession.getWebinosPath ();
+
+  try {
+    var child = require('child_process');
+    widgetLibrary = require("webinos-widget");
+
+    var idList = widgetLibrary.widgetmanager.getInstalledWidgets();
+    for (var installId in idList) {
+      var cfg = widgetLibrary.widgetmanager.getWidgetConfig(idList[installId]);
+      if (cfg.startFile.contentType === "text/javascript") {
+        console.log("starting service widget " + cfg.installId);
+        var widgetDir = widgetLibrary.widgetmanager.getWidgetDir(cfg.installId);
+        var widgetPath = path.join(widgetDir,cfg.startFile.path);
+        console.log("*** " + widgetPath);
+        var childProc = child.fork(widgetPath);
+        console.log("*** forked: " + childProc.pid);
+        childProc.on("close", function(code,signal) { console.log("service widget closed with code: " + code + " and signal " + signal); });
+        childProc.on("exit", function(code,signal) { console.log("service widget ended with code: " + code + " and signal " + signal); });
+      }
+    }
+
+  } catch(e) {
+    console.log("********** unable to load service widgets - failed to load widget manager: " + e.message);
+  }
+}
+
 function startPzp() {
     var pzpInstance = PzpSession.getInstance();
     pzpInstance.on("PZP_STARTED", function(){
+        startServiceWidgets();
         testStart(true);
         if (argv.widgetServer) initializeWidgetServer ();
     });
