@@ -143,29 +143,23 @@ function initializeWidgetServer () {
 
 function startServiceWidgets() {
   var widgetLibrary;
-  var webinosPath = PzpSession.getWebinosPath ();
+  var remoteManagement;
 
   try {
-    var child = require('child_process');
     widgetLibrary = require("webinos-widget");
+    remoteManagement = require("webinos-api-remoteManagement/lib/remoteManagement_impl.js");
 
     var idList = widgetLibrary.widgetmanager.getInstalledWidgets();
     for (var installId in idList) {
       var cfg = widgetLibrary.widgetmanager.getWidgetConfig(idList[installId]);
-      if (cfg.startFile.contentType === "text/javascript") {
-        console.log("starting service widget " + cfg.installId);
-        var widgetDir = widgetLibrary.widgetmanager.getWidgetDir(cfg.installId);
-        var widgetPath = path.join(widgetDir,cfg.startFile.path);
-        console.log("*** " + widgetPath);
-        var childProc = child.fork(widgetPath);
-        console.log("*** forked: " + childProc.pid);
-        childProc.on("close", function(code,signal) { console.log("service widget closed with code: " + code + " and signal " + signal); });
-        childProc.on("exit", function(code,signal) { console.log("service widget ended with code: " + code + " and signal " + signal); });
+      if (cfg.startFile.contentType === "text/javascript" && cfg.autostart === 1) {
+        console.log("auto-starting service widget " + cfg.installId);
+        remoteManagement.startApp(cfg.installId);
       }
     }
 
   } catch(e) {
-    console.log("********** unable to load service widgets - failed to load widget manager: " + e.message);
+    console.log("********** unable to load service widgets - " + e.message);
   }
 }
 
