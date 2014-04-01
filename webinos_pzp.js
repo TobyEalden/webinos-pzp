@@ -147,7 +147,7 @@ function startServiceWidgets() {
 
   try {
     widgetLibrary = require("webinos-widget");
-    remoteManagement = require("webinos-api-remoteManagement/lib/remoteManagement_impl.js");
+    remoteManagement = require("ubiapps-api-remoteManagement/lib/remoteManagement_impl.js");
 
     var idList = widgetLibrary.widgetmanager.getInstalledWidgets();
     for (var installId in idList) {
