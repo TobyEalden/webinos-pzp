@@ -71,6 +71,12 @@ if (typeof _webinos === "undefined") {
     }
     webinos.session.setChannel = function(_channel) {
         channel = _channel;
+        if (channel === null) {
+          connectedDevices = [];
+          isConnected = false;
+          sessionId = null;
+          callListenerForMsg({ payload: { status: "connectionLost" }});
+        }
     };
     webinos.session.setPzpPort = function (port_) {
         port = port_;

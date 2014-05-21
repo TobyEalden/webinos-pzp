@@ -97,7 +97,8 @@
             // Get the correct websocket object.
             var ws = window.WebSocket || window.MozWebSocket;
             try {
-                channel = new ws ("ws://" + hostname + ":" + port);
+//                channel = new ws ("ws://" + hostname + ":" + port);
+              channel = new ws ("ws://" + hostname);
             } catch (err) { // Websockets are not available for this browser. We need to investigate in order to support it.
                 throw new Error ("Your browser does not support websockets. Please report your browser on webinos.org.");
             }
@@ -123,6 +124,8 @@
         };
         channel.onerror = function(evt) {
           console.error("WebSocket error", evt);
+          webinos.session.setChannel(null);
+          setTimeout(createCommChannel,10000);
         };
     }
 
